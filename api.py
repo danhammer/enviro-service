@@ -1,6 +1,7 @@
 import webapp2
 import json
 import dummy
+import config
 from datetime import date
 
 from utils import paths
@@ -54,7 +55,8 @@ class DummyWaterHandler(webapp2.RequestHandler):
         dt = self.request.get('date', TODAY)
 
         # response
-        self.response.write(json.dumps(dummy.water(coords, dt, viewer)))
+        res = json.dumps(dummy.water_service(coords, dt, viewer))
+        self.response.write(res)
 
 
 class DummyDeforestationHandler(webapp2.RequestHandler):

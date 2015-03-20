@@ -1,6 +1,7 @@
 import random
 from utils import buildings
 from utils import utils
+from utils import water
 
 
 def cars(coords, date, viewer=True):
@@ -44,14 +45,22 @@ def change(coords, date, viewer=True):
     )
 
 
-def water(coords, date, viewer=True):
-    s = random.uniform(0.1, 0.9)
-    change_poly = utils.scale_poly(coords, scale=s)
+def water_service(coords, date, viewer=True):
+    # s = random.uniform(0.1, 0.9)
+    # change_poly = utils.scale_poly(coords, scale=s)
+    # return dict(
+    #     area=s,
+    #     date=date,
+    #     change_poly=utils.to_poly(change_poly, viewer=False),
+    #     poly=utils.to_poly(coords, viewer=viewer)
+    # )
+    poly = utils.to_poly(coords, viewer=viewer)
+    year = int(date.split("-")[0])
+    area = water.surface_water(poly['geometry']['coordinates'], year)
     return dict(
-        area=s,
+        area=area,
         date=date,
-        change_poly=utils.to_poly(change_poly, viewer=False),
-        poly=utils.to_poly(coords, viewer=viewer)
+        poly=poly
     )
 
 
