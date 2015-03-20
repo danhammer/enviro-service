@@ -56,6 +56,12 @@ def to_point(x, y):
     }
 
 
+def get_url(geo):
+    base = 'http://geojson.io/#data=data:application/json,'
+    url = base + urllib.quote(json.JSONEncoder().encode(geo))
+    return url
+
+
 def to_poly(coords, viewer=True):
 
     if coords[0] != coords[-1]:

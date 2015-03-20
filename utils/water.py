@@ -1,5 +1,6 @@
 import ee
 
+
 def surface_water(coords, year):
 
     loc = "L7_TOA_1YEAR/%s" % year
@@ -17,14 +18,30 @@ def surface_water(coords, year):
     poly = ee.Geometry.Polygon(*coords)
     img = ee.Image(loc).clip(poly)
     water = img.expression(exp)
-    threshold_exp = "(b(0) > 0) ? 1 : 0"
+    threshold_exp = "(b(0) > 4) ? 1 : 0"
     binary = water.expression(threshold_exp)
-    res = binary.reduceRegion(
+
+    area = binary.reduceRegion(
         ee.Reducer.mean(),
         poly,
         30,
         None,
         None,
         True
+    ).getInfo()
+
+    ct = binary.mask(binary).connectedPixelCount(200, )
+    x = ct.clip(poly).reduceToVectors(
+        ee.Reducer.countEvery(),
+        poly,
+        500,
+        "polygon",
+        True,
+        "label",
+        None,
+        None,
+        False,
+        500000
     )
-    return res.getInfo()
+    res = dict(area=area, geom=x.getInfo())
+    return res

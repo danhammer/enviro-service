@@ -56,9 +56,11 @@ def water_service(coords, date, viewer=True):
     # )
     poly = utils.to_poly(coords, viewer=viewer)
     year = int(date.split("-")[0])
-    area = water.surface_water(poly['geometry']['coordinates'], year)
+    res = water.surface_water(poly['geometry']['coordinates'], year)
+
     return dict(
-        area=area,
+        area=res['area'],
+        features=utils.get_url(res['geom']),
         date=date,
         poly=poly
     )
