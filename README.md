@@ -1,0 +1,1 @@
+The endpoints for this repository represent the interface between the research team and the product team, or specifically the end of the research process and the beginning of front-end development.  The dummy endpoints are a stand-in for the actual analysis, designed to structure the data hand-off.
