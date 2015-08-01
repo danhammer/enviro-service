@@ -1,5 +1,5 @@
-application: ninja-service
-version: production
+application: water-test
+version: vizz
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -13,6 +13,8 @@ libraries:
   version: "latest"
 - name: pycrypto
   version: "latest" 
+- name: numpy
+  version: "latest"
 
 handlers:
 - url: /.*

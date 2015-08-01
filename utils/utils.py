@@ -1,3 +1,6 @@
+import paths
+paths.fix_path()
+
 import urllib
 import random
 import json

@@ -1,8 +1,10 @@
 import webapp2
 import json
-import dummy
-import config
+import envirohook
 from datetime import date
+
+# Required for Earth Engine authentication
+import config
 
 from utils import paths
 paths.fix_path()
@@ -10,11 +12,11 @@ paths.fix_path()
 TODAY = date.today().strftime("%Y-%m-%d")
 
 
-class DummyCarHandler(webapp2.RequestHandler):
+class WaterHandler(webapp2.RequestHandler):
     def get(self):
-        """
-        """
+
         # headers
+        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
         self.response.headers['Content-Type'] = 'application/json'
 
         # parameters
@@ -23,81 +25,66 @@ class DummyCarHandler(webapp2.RequestHandler):
         dt = self.request.get('date', TODAY)
 
         # response
-        self.response.write(json.dumps(dummy.cars(coords, dt, viewer)))
-
-
-class DummyChangeHandler(webapp2.RequestHandler):
-    def get(self):
-        """
-        """
-        # headers
-        self.response.headers['Content-Type'] = 'application/json'
-
-        # parameters
-        coords = json.loads(self.request.get('coords'))
-        viewer = bool(self.request.get('viewer', False))
-        dt = self.request.get('date', TODAY)
-
-        # response
-        self.response.write(json.dumps(dummy.change(coords, dt, viewer)))
-
-
-class DummyWaterHandler(webapp2.RequestHandler):
-    def get(self):
-        """
-        """
-        # headers
-        self.response.headers['Content-Type'] = 'application/json'
-
-        # parameters
-        coords = json.loads(self.request.get('coords'))
-        viewer = bool(self.request.get('viewer', False))
-        dt = self.request.get('date', TODAY)
-
-        # response
-        res = json.dumps(dummy.water_service(coords, dt, viewer))
+        res = json.dumps(envirohook.water_service(coords, dt, viewer))
         self.response.write(res)
 
 
-class DummyDeforestationHandler(webapp2.RequestHandler):
+class WaterSeriesHandler(webapp2.RequestHandler):
     def get(self):
-        """
-        """
+
         # headers
+        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
         self.response.headers['Content-Type'] = 'application/json'
 
         # parameters
         coords = json.loads(self.request.get('coords'))
         viewer = bool(self.request.get('viewer', False))
+        end = self.request.get('end', TODAY)
+        begin = self.request.get('begin', '2012-01-01')
+
+        # response
+        series = envirohook.water_series_service(coords, begin, end, viewer)
+        res = json.dumps(series)
+        self.response.write(res)
+
+
+class DeforestationHandler(webapp2.RequestHandler):
+    def get(self):
+
+        # headers
+        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+        self.response.headers['Content-Type'] = 'application/json'
+
+        # parameters
+        coords = json.loads(self.request.get('coords'))
         begin = self.request.get('begin', '2005-12-15')
         end = self.request.get('end', TODAY)
 
         # response
-        res = json.dumps(dummy.deforestation(coords, begin, end, viewer))
+        res = json.dumps(envirohook.deforestation_service(coords, begin, end,))
         self.response.write(res)
 
 
-class DummyBuildingsHandler(webapp2.RequestHandler):
+class VegetationHandler(webapp2.RequestHandler):
     def get(self):
-        """
-        """
         # headers
+        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
         self.response.headers['Content-Type'] = 'application/json'
 
         # parameters
         coords = json.loads(self.request.get('coords'))
-        viewer = bool(self.request.get('viewer', False))
-        dt = self.request.get('end', TODAY)
+        end = self.request.get('end', TODAY)
+        begin = self.request.get('begin', '2012-01-01')
 
         # response
-        res = json.dumps(dummy.building_service(coords, dt, viewer))
+        series = envirohook.vegetation_service(coords, begin, end)
+        res = json.dumps(series)
         self.response.write(res)
 
 
 handlers = webapp2.WSGIApplication([
-    ('/api/dummy/cars', DummyCarHandler),
-    ('/api/dummy/change', DummyChangeHandler),
-    ('/api/dummy/water', DummyWaterHandler),
-    ('/api/dummy/buildings', DummyBuildingsHandler),
-    ('/api/dummy/deforestation', DummyDeforestationHandler)
+    ('/water', WaterHandler),
+    ('/water/series', WaterSeriesHandler),
+    ('/deforestation', DeforestationHandler),
+    ('/vegetation/series', VegetationHandler)
 ], debug=True)
