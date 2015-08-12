@@ -2,6 +2,7 @@ import webapp2
 import json
 import envirohook
 from datetime import date
+from utils import osm
 
 # Required for Earth Engine authentication
 import config
@@ -82,9 +83,33 @@ class VegetationHandler(webapp2.RequestHandler):
         self.response.write(res)
 
 
+class BuildingsHandler(webapp2.RequestHandler):
+    def get(self):
+        # headers
+        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+        self.response.headers['Content-Type'] = 'application/json'
+
+        # parameters
+        bbox = dict(
+            xmin=float(self.request.get('xmin')),
+            ymin=float(self.request.get('ymin')),
+            xmax=float(self.request.get('xmax')),
+            ymax=float(self.request.get('ymax'))
+        )
+        residential_bool = self.request.get('residential', 'False')
+        if residential_bool in set(['False', 'false']):
+            rbool = False
+        else:
+            rbool = True
+
+        # response
+        res = json.dumps(osm.grab(bbox, rbool))
+        self.response.write(res)
+
 handlers = webapp2.WSGIApplication([
     ('/water', WaterHandler),
     ('/water/series', WaterSeriesHandler),
     ('/deforestation', DeforestationHandler),
-    ('/vegetation/series', VegetationHandler)
+    ('/vegetation/series', VegetationHandler),
+    ('/buildings', BuildingsHandler)
 ], debug=True)
